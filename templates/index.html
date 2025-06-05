@@ -1,0 +1,207 @@
+{% extends "base.html" %} 
+
+{% block content %}
+<!-- Zomato Banner with Search Bar -->
+<div class="zomato-banner">
+    <div class="zomato-text">
+        <h1>zomato</h1>
+        <p>🥂Discover best food and drinks🥂</p>
+        <form action="{{ url_for('index') }}" method="GET" class="search-bar">
+            <input type="text" name="search" placeholder="Search by restaurant, dish, cuisine" value="{{ search_query }}">
+            <input type="text" name="city" placeholder="Enter city" value="{{ city_query }}">
+            <button type="submit">Search</button>
+        </form>
+        <br>
+        <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <button id="upload-button" type="submit">Upload</button>
+        </form>
+        
+        
+    </div>
+</div>
+
+<!-- Restaurant Listing -->
+<div class="restaurant-container">
+    {% for restaurant in restaurants %}
+        <a href="{{ url_for('restaurant_detail', res_id=restaurant['restaurant']['R']['res_id']) }}" class="restaurant-card">
+            <img src="{{ restaurant['restaurant']['featured_image'] }}" alt="{{ restaurant['restaurant']['name'] }}">
+            <h3 class="restaurant-name">{{ restaurant['restaurant']['name'] }}</h3>
+            <p class="rating">⭐ {{ restaurant['restaurant']['user_rating']['aggregate_rating'] }}/5</p>
+            <p class="cuisine"><b>Cuisine:</b> {{ restaurant['restaurant']['cuisines'] }}</p>
+            <p class="address"><b>📍 Address:</b> {{ restaurant['restaurant']['location']['address'] }}</p>
+        </a>
+    {% endfor %}
+</div>
+
+<!-- Pagination (Aligned to Extreme Bottom Corners) -->
+
+<div class="pagination">
+    {% if page > 1 %}
+        <a class="prev" href="
+            {% if search_query %}
+                {{ url_for('index', page=page-1, search=search_query, city=city_query) }}
+            {% else %}
+                {{ url_for('upload_file', page=page-1) }}
+            {% endif %}
+        " onclick="setDarkMode()">⬅️ Previous</a>
+    {% else %}
+        <div></div> <!-- Empty div to keep "Next" at the right corner when "Previous" is hidden -->
+    {% endif %}
+
+    {% if page * 8 < total %}
+        <a class="next" href="
+            {% if search_query %}
+                {{ url_for('index', page=page+1, search=search_query, city=city_query) }}
+            {% else %}
+                {{ url_for('upload_file', page=page+1) }}
+            {% endif %}
+        " onclick="setDarkMode()">Next ➡️</a>
+    {% endif %}
+</div>
+
+
+<!-- Internal CSS -->
+<style>
+    /* Zomato Banner Styling */
+    .zomato-banner {
+        background: url('https://b.zmtcdn.com/web_assets/81f3ff974d82520780078ba1cfbd453a1583259680.png') center/cover no-repeat;
+        height: 312px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+    .zomato-text {
+        background: rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        border-radius: 10px;
+    }
+    .zomato-text h1 {
+        font-size: 50px;
+        font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif
+    }
+    .zomato-text p {
+        font-size: 29px;
+        font-family: Georgia, 'Times New Roman', Times, serif;
+    }
+    #upload-button{
+        background-color: #e01e1e;
+        color: #DDD;
+        border: none;
+        border-radius: 5px;
+    }
+    .search-bar {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .search-bar input, .search-bar button {
+        padding: 12px;
+        border: none;
+        border-radius: 5px;
+    }
+    .search-bar button{
+        background-color: #e01e1e;
+        color: #DDD;
+    }
+    input[name="search"] {
+      width: 220px;
+      padding: 8px;
+      /* font-size: 16px; */
+  }
+
+    /* Restaurant Grid */
+    .restaurant-container {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 25px;
+        padding: 30px;
+        justify-content: center;
+    }
+
+    /* Clickable Restaurant Card */
+    .restaurant-card {
+        width: 300px;
+        background: white;
+        box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        overflow: hidden;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        padding: 15px;
+        text-decoration: none;
+        color: black;
+        display: block;
+    }
+    .restaurant-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 4px 4px 15px rgba(0,0,0,0.2);
+    }
+    .restaurant-card img {
+        width: 100%;
+        height: 230px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    .restaurant-name {
+        font-size: 18px;
+        font-weight: bold;
+        color: #007BFF;
+        margin: 10px 0 5px;
+    }
+    .rating {
+        font-size: 16px;
+        font-weight: bold;
+        color: #FFA500;
+        margin-bottom: 5px;
+    }
+    .cuisine, .address {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+    }
+
+    /* Pagination Styling */
+    .pagination {
+        display: flex;
+        justify-content: space-between; /* Align Previous (Left) & Next (Right) */
+        padding: 20px;
+        margin-top: 20px;
+    }
+    .pagination a {
+        padding: 10px 20px;
+        background: #ff0000;
+        color: white;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 5px;
+        transition: background 0.3s ease;
+    }
+    .pagination a:hover {
+        background: #0056b3;
+    }
+
+    /* Dark Mode Adjustments */
+    body.dark-mode .restaurant-card {
+        background: #222;
+    }
+    body.dark-mode .restaurant-card .restaurant-name {
+        color: #66CCFF;
+    }
+    body.dark-mode .restaurant-card .rating, 
+    body.dark-mode .restaurant-card .cuisine,
+    body.dark-mode .restaurant-card .address {
+        color: #DDD;
+    }
+</style>
+
+<!-- JavaScript for Dark Mode Persistence -->
+<script>
+    function setDarkMode() {
+        localStorage.setItem("dark-mode", document.body.classList.contains("dark-mode"));
+    }
+</script>
+{% endblock %}
