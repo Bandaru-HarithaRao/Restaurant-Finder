@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="restaurant-detail">
+    <h2>{{ restaurant.name }}</h2>
+    <img src="{{ restaurant.featured_image }}" alt="{{ restaurant.name }}">
+    <p><strong>Cuisine:</strong> {{ restaurant.cuisines }}</p>
+    <p><strong>Rating:</strong> ⭐ {{ restaurant.user_rating.aggregate_rating }}/5</p>
+    <p><strong>Address:</strong> {{ restaurant.location.address }}</p>
+    <p><a href="{{ restaurant.menu_url }}" target="_blank">📜 View Menu</a></p>
+    <p><a href="{{ restaurant.url }}" target="_blank">🌍 More About This Place</a></p>
+    <a href="{{ url_for('index') }}" class="back-button">⬅️ Back</a>
+</div>
+
+<!-- Internal CSS -->
+<style>
+    .restaurant-detail {
+        background-color: rgb(237, 251, 255);
+        max-width: 600px;
+        margin: auto;
+        text-align: center;
+    }
+    .restaurant-detail img {
+        width: 100%;
+        max-height: 220px;
+        object-fit: cover;
+        border-radius: 10px;
+    }
+    .back-button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 10px 20px;
+        background-color: red;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    /* Dark Mode Fix */
+    body.dark-mode .restaurant-detail {
+        background: #222;
+        color: white;
+    }
+</style>
+
+<script>
+    // Maintain dark mode when navigating back
+    if (localStorage.getItem("dark-mode") === "true") {
+        document.body.classList.add("dark-mode");
+    }
+</script>
+{% endblock %}        
