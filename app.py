@@ -18,7 +18,7 @@ db = client["zomatoDB"]
 collection = db["details"]
 
 # Configure Gemini API (Replace with your actual API key)
-genai.configure(api_key="AIzaSyAR9ciNMqn3nVVg8DFNJKRz0AzOta53ea4")
+genai.configure(api_key="")
 
 # Upload Folder Configuration
 UPLOAD_FOLDER = "static/uploads"
